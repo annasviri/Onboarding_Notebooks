@@ -105,6 +105,88 @@
 
 -- COMMAND ----------
 
+CREATE OR REPLACE TEMP VIEW events_pivot as 
+SELECT 
+user_id as user,	
+cart,	
+pillows,	
+login,	
+main,	
+careers,	
+guest,	
+faq,	
+down,	
+warranty,	
+finalize,	
+register,	
+shipping_info,	
+checkout,	
+mattresses,	
+add_item,	
+press,	
+email_coupon,	
+cc_info,	
+foam,	
+reviews,	
+original,	
+delivery,	
+premium	
+from events 
+
+pivot (
+  count(event_name) for event_name in 
+  ("cart", "pillows", "login", "main", "careers", "guest", "faq", "down", "warranty", "finalize", 
+ "register", "shipping_info", "checkout", "mattresses", "add_item", "press", "email_coupon", 
+ "cc_info", "foam", "reviews", "original", "delivery", "premium")
+)
+
+-- COMMAND ----------
+
+Select count(*) from events_pivot
+
+-- COMMAND ----------
+
+SELECT * from events where user_id="UA000000106525232"
+
+-- COMMAND ----------
+
+SELECT 
+user_id as user,	
+cart,	
+pillows,	
+login,	
+main,	
+careers,	
+guest,	
+faq,	
+down,	
+warranty,	
+finalize,	
+register,	
+shipping_info,	
+checkout,	
+mattresses,	
+add_item,	
+press,	
+email_coupon,	
+cc_info,	
+foam,	
+reviews,	
+original,	
+delivery,	
+premium	
+from events 
+
+pivot (
+  count(event_name) for event_name in 
+  ("cart", "pillows", "login", "main", "careers", "guest", "faq", "down", "warranty", "finalize", 
+ "register", "shipping_info", "checkout", "mattresses", "add_item", "press", "email_coupon", 
+ "cc_info", "foam", "reviews", "original", "delivery", "premium")
+) 
+where user_id="UA000000106525232"
+
+-- COMMAND ----------
+
 -- MAGIC %python
 -- MAGIC # SOURCE_ONLY
 -- MAGIC # for testing only; include checks after each language solution
