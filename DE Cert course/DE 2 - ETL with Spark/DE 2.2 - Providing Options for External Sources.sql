@@ -115,7 +115,13 @@ LOCATION "${DA.paths.sales_csv}"
 -- MAGIC %python
 -- MAGIC spark.sql(f"""
 -- MAGIC CREATE TABLE IF NOT EXISTS sales_csv
--- MAGIC   (order_id LONG, email STRING, transactions_timestamp LONG, total_item_quantity INTEGER, purchase_revenue_in_usd DOUBLE, unique_items INTEGER, items STRING)
+-- MAGIC   (order_id LONG, 
+-- MAGIC   email STRING, 
+-- MAGIC   transactions_timestamp LONG, 
+-- MAGIC   total_item_quantity INTEGER, 
+-- MAGIC   purchase_revenue_in_usd DOUBLE, 
+-- MAGIC   unique_items INTEGER, 
+-- MAGIC   items STRING)
 -- MAGIC USING CSV
 -- MAGIC OPTIONS (
 -- MAGIC   header = "true",
@@ -296,10 +302,21 @@ DESCRIBE EXTENDED users_jdbc
 -- MAGIC import pyspark.sql.functions as F
 -- MAGIC
 -- MAGIC location = spark.sql("DESCRIBE EXTENDED users_jdbc").filter(F.col("col_name") == "Location").first()["data_type"]
--- MAGIC print(location)
+-- MAGIC print(location) #filter out the result of metadata query
 -- MAGIC
 -- MAGIC files = dbutils.fs.ls(location)
--- MAGIC print(f"Found {len(files)} files")
+-- MAGIC print(f"Found {len(files)} files") #count files in the directory
+
+-- COMMAND ----------
+
+-- MAGIC %python
+-- MAGIC import pyspark.sql.functions as F
+-- MAGIC
+-- MAGIC location = spark.sql("DESCRIBE EXTENDED sales_csv").filter(F.col("col_name") == "Location").first()["data_type"]
+-- MAGIC print(location) #filter out the result of metadata query
+-- MAGIC
+-- MAGIC files = dbutils.fs.ls(location)
+-- MAGIC print(f"Found {len(files)} files") #count files in the directory
 
 -- COMMAND ----------
 

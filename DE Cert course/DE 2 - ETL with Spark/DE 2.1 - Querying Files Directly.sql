@@ -110,6 +110,11 @@ SELECT * FROM json.`${DA.paths.kafka_events}/001.json`
 
 -- COMMAND ----------
 
+SELECT * FROM json.`dbfs:/mnt/dbacademy-datasets/data-engineer-learning-path/v04/ecommerce/raw/events-kafka/001.json`
+
+
+-- COMMAND ----------
+
 -- MAGIC %md
 -- MAGIC
 -- MAGIC

@@ -61,6 +61,10 @@
 
 -- COMMAND ----------
 
+SELECT * FROM users_dirty limit 10
+
+-- COMMAND ----------
+
 SELECT count(*), count(user_id), count(user_first_touch_timestamp), count(email), count(updated)
 FROM users_dirty
 
