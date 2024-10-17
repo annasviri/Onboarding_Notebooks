@@ -108,37 +108,37 @@
 CREATE OR REPLACE TEMP VIEW events_pivot as 
 SELECT 
 user_id as user,	
-cart,	
-pillows,	
-login,	
-main,	
-careers,	
-guest,	
-faq,	
-down,	
-warranty,	
-finalize,	
-register,	
-shipping_info,	
-checkout,	
-mattresses,	
-add_item,	
-press,	
-email_coupon,	
-cc_info,	
-foam,	
-reviews,	
-original,	
-delivery,	
-premium	
-from events 
-
-pivot (
-  count(event_name) for event_name in 
+sum(cart) as cart,	
+sum(pillows) as pillows,	
+sum(login) as login,	
+sum(main) as main,	
+sum(careers) as careers,	
+sum(guest) as guest,	
+sum(faq) as faq,	
+sum(down) as down,	
+sum(warranty) as warranty,	
+sum(finalize) as finalize,	
+sum(register) as register,	
+sum(shipping_info) as shipping_info,	
+sum(checkout) as checkout,	
+sum(mattresses) as mattresses,	
+sum(add_item) as add_item,	
+sum(press) as press,	
+sum(email_coupon) as email_coupon,	
+sum(cc_info) as cc_info,	
+sum(foam) as foam,	
+sum(reviews) as reviews,	
+sum(original) as original,	
+sum(delivery) as delivery,	
+sum(premium) as premium	
+FROM events 
+PIVOT (
+  COUNT(event_name) FOR event_name IN 
   ("cart", "pillows", "login", "main", "careers", "guest", "faq", "down", "warranty", "finalize", 
  "register", "shipping_info", "checkout", "mattresses", "add_item", "press", "email_coupon", 
  "cc_info", "foam", "reviews", "original", "delivery", "premium")
-)
+) 
+GROUP BY user_id
 
 -- COMMAND ----------
 
@@ -146,44 +146,50 @@ Select count(*) from events_pivot
 
 -- COMMAND ----------
 
-SELECT * from events where user_id="UA000000106525232"
-
--- COMMAND ----------
 
 SELECT 
 user_id as user,	
-cart,	
-pillows,	
-login,	
-main,	
-careers,	
-guest,	
-faq,	
-down,	
-warranty,	
-finalize,	
-register,	
-shipping_info,	
-checkout,	
-mattresses,	
-add_item,	
-press,	
-email_coupon,	
-cc_info,	
-foam,	
-reviews,	
-original,	
-delivery,	
-premium	
-from events 
-
-pivot (
-  count(event_name) for event_name in 
+sum(cart) as cart,	
+sum(pillows) as pillows,	
+sum(login) as login,	
+sum(main) as main,	
+sum(careers) as careers,	
+sum(guest) as guest,	
+sum(faq) as faq,	
+sum(down) as down,	
+sum(warranty) as warranty,	
+sum(finalize) as finalize,	
+sum(register) as register,	
+sum(shipping_info) as shipping_info,	
+sum(checkout) as checkout,	
+sum(mattresses) as mattresses,	
+sum(add_item) as add_item,	
+sum(press) as press,	
+sum(email_coupon) as email_coupon,	
+sum(cc_info) as cc_info,	
+sum(foam) as foam,	
+sum(reviews) as reviews,	
+sum(original) as original,	
+sum(delivery) as delivery,	
+sum(premium) as premium	
+FROM events 
+PIVOT (
+  COUNT(event_name) FOR event_name IN 
   ("cart", "pillows", "login", "main", "careers", "guest", "faq", "down", "warranty", "finalize", 
  "register", "shipping_info", "checkout", "mattresses", "add_item", "press", "email_coupon", 
  "cc_info", "foam", "reviews", "original", "delivery", "premium")
 ) 
-where user_id="UA000000106525232"
+WHERE user_id="UA000000106525232"
+GROUP BY user_id
+
+
+-- COMMAND ----------
+
+describe events_pivot
+
+-- COMMAND ----------
+
+SELECT * from events where user_id="UA000000106525232"
 
 -- COMMAND ----------
 
@@ -191,6 +197,12 @@ where user_id="UA000000106525232"
 -- MAGIC # SOURCE_ONLY
 -- MAGIC # for testing only; include checks after each language solution
 -- MAGIC check_table_results("events_pivot", 204586, ['user', 'cart', 'pillows', 'login', 'main', 'careers', 'guest', 'faq', 'down', 'warranty', 'finalize', 'register', 'shipping_info', 'checkout', 'mattresses', 'add_item', 'press', 'email_coupon', 'cc_info', 'foam', 'reviews', 'original', 'delivery', 'premium'])
+
+-- COMMAND ----------
+
+-- MAGIC %python
+-- MAGIC assert True
+-- MAGIC assert False, "Oh no, it's error"
 
 -- COMMAND ----------
 
@@ -205,6 +217,24 @@ where user_id="UA000000106525232"
 -- MAGIC # (spark.read
 -- MAGIC #     <FILL_IN>
 -- MAGIC #     .createOrReplaceTempView("events_pivot"))
+
+-- COMMAND ----------
+
+describe events
+
+-- COMMAND ----------
+
+-- MAGIC %python
+-- MAGIC from pyspark.sql.functions import col, count
+-- MAGIC
+-- MAGIC event_df = (spark.read.table("events")
+-- MAGIC     .select(col("user_id").alias("user"), "event_name")
+-- MAGIC     .groupBy("user")
+-- MAGIC     .pivot("event_name")
+-- MAGIC     .count()
+-- MAGIC     .createOrReplaceTempView("events_pivot")
+-- MAGIC      )
+-- MAGIC
 
 -- COMMAND ----------
 
@@ -265,6 +295,17 @@ where user_id="UA000000106525232"
 
 -- COMMAND ----------
 
+CREATE OR REPLACE TEMP VIEW clickpaths AS
+SELECT events_pivot.*, transactions.*
+FROM events_pivot INNER JOIN transactions  
+  ON events_pivot.user = transactions.user_id
+
+-- COMMAND ----------
+
+describe transactions
+
+-- COMMAND ----------
+
 -- MAGIC %python
 -- MAGIC # SOURCE_ONLY
 -- MAGIC check_table_results("clickpaths", 9085, ['user', 'cart', 'pillows', 'login', 'main', 'careers', 'guest', 'faq', 'down', 'warranty', 'finalize', 'register', 'shipping_info', 'checkout', 'mattresses', 'add_item', 'press', 'email_coupon', 'cc_info', 'foam', 'reviews', 'original', 'delivery', 'premium', 'user_id', 'order_id', 'transaction_timestamp', 'total_item_quantity', 'purchase_revenue_in_usd', 'unique_items', 'P_FOAM_K', 'M_STAN_Q', 'P_FOAM_S', 'M_PREM_Q', 'M_STAN_F', 'M_STAN_T', 'M_PREM_K', 'M_PREM_F', 'M_STAN_K', 'M_PREM_T', 'P_DOWN_S', 'P_DOWN_K'])
@@ -282,6 +323,19 @@ where user_id="UA000000106525232"
 -- MAGIC # (spark.read
 -- MAGIC #     <FILL_IN>
 -- MAGIC #     .createOrReplaceTempView("clickpaths"))
+
+-- COMMAND ----------
+
+-- MAGIC %python
+-- MAGIC events_pivot_DF = spark.read.table("events_pivot")
+-- MAGIC transactions_DF = spark.read.table("transactions")
+-- MAGIC
+-- MAGIC clickpaths_DF = (events_pivot_DF.join(transactions_DF
+-- MAGIC                                       , events_pivot_DF.user == transactions_DF.user_id)
+-- MAGIC                  .createOrReplaceTempView("clickpaths"))
+-- MAGIC
+-- MAGIC #display(clickpaths_DF)
+-- MAGIC
 
 -- COMMAND ----------
 

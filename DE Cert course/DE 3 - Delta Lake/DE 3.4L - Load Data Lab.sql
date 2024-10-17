@@ -68,7 +68,24 @@
 
 -- COMMAND ----------
 
--- <FILL_IN>
+describe schema  anna_sviridova_2nsm_da_dewd;
+
+
+-- COMMAND ----------
+
+use anna_sviridova_2nsm_da_dewd ;
+CREATE OR REPLACE TABLE  events_raw (
+  key binary,
+  offset long,
+  partition int,
+  timestamp long,
+  topic string,
+  value binary
+)
+
+-- COMMAND ----------
+
+describe events_raw
 
 -- COMMAND ----------
 
@@ -108,7 +125,13 @@
 
 -- COMMAND ----------
 
--- <FILL_IN>
+describe events_json
+
+-- COMMAND ----------
+
+INSERT INTO events_raw 
+SELECT *
+from events_json
 
 -- COMMAND ----------
 
@@ -120,7 +143,7 @@
 
 -- COMMAND ----------
 
--- <FILL_IN>
+select * from events_raw
 
 -- COMMAND ----------
 
@@ -163,6 +186,12 @@
 -- COMMAND ----------
 
 -- <FILL_IN> ${da.paths.datasets}/ecommerce/raw/item-lookup
+
+-- COMMAND ----------
+
+Create or Replace table item_lookup as 
+select * from parquet.`${da.paths.datasets}/ecommerce/raw/item-lookup`
+
 
 -- COMMAND ----------
 

@@ -104,7 +104,7 @@ WHEN NOT MATCHED AND b.delicious = true THEN
 
 -- COMMAND ----------
 
--- <FILL-IN>
+describe history beans
 
 -- COMMAND ----------
 
@@ -168,8 +168,9 @@ SELECT * FROM beans
 
 -- COMMAND ----------
 
--- CREATE OR REPLACE TEMP VIEW pre_delete_vw AS
--- <FILL-IN>
+CREATE OR REPLACE TEMP VIEW pre_delete_vw AS
+select *
+from beans VERSION AS OF 4
 
 -- COMMAND ----------
 
@@ -202,7 +203,7 @@ SELECT * FROM pre_delete_vw
 
 -- COMMAND ----------
 
--- <FILL-IN>
+RESTORE beans TO VERSION AS OF 5
 
 -- COMMAND ----------
 
@@ -236,7 +237,8 @@ DESCRIBE HISTORY beans
 
 -- COMMAND ----------
 
--- <FILL-IN>
+OPTIMIZE beans
+ZORDER BY (name)
 
 -- COMMAND ----------
 
@@ -360,7 +362,7 @@ SELECT * FROM beans
 
 -- COMMAND ----------
 
--- SELECT * FROM beans@v1
+SELECT * FROM beans@v4
 
 -- COMMAND ----------
 
