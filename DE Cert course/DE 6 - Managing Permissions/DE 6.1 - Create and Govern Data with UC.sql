@@ -169,6 +169,14 @@ GRANT USAGE ON SCHEMA example TO `account users`;
 
 -- COMMAND ----------
 
+show tables
+
+-- COMMAND ----------
+
+select * from agg_heartrate
+
+-- COMMAND ----------
+
 GRANT SELECT ON VIEW agg_heartrate to `account users`
 
 -- COMMAND ----------

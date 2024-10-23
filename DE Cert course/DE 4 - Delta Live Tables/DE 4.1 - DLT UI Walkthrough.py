@@ -180,6 +180,10 @@ DA.start_pipeline()
 
 # COMMAND ----------
 
+DA.dlt_data_factory.load()
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC ### Next Steps
 # MAGIC
@@ -194,10 +198,6 @@ DA.start_pipeline()
 # MAGIC 4. **Finally, 4.2:** Once you've gone through the previous notebooks, you'll be well-prepared to tackle the content in section 4.2.
 # MAGIC
 # MAGIC Take your time, and feel free to revisit any section as needed to solidify your understanding. **Happy learning!**
-
-# COMMAND ----------
-
-DA.dlt_data_factory.load()
 
 # COMMAND ----------
 
