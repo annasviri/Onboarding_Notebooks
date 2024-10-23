@@ -74,6 +74,64 @@
 
 -- COMMAND ----------
 
+select * from json.`${DA.paths.kafka_events}`
+
+-- COMMAND ----------
+
+drop table spark_catalog.anna_sviridova_2nsm_da_dewd.events_json
+
+-- COMMAND ----------
+
+--create delta table with proper data formats
+
+CREATE or REPLACE TABLE spark_catalog.anna_sviridova_2nsm_da_dewd.events_json as 
+SELECT 
+  cast(key as BINARY) as key, 
+  cast(offset as LONG) as offset, 
+  cast(partition as INTEGER) as partition, 
+  cast(timestamp as LONG) as timestamp, 
+  cast(topic as STRING) as topic, 
+  cast(value as BINARY) as value
+FROM json.`${DA.paths.kafka_events}`;
+
+
+
+-- COMMAND ----------
+
+--other option to create table as external -- but it require to cast columns
+
+CREATE TABLE spark_catalog.anna_sviridova_2nsm_da_dewd.events_json  
+USING JSON
+location '${DA.paths.kafka_events}'
+
+
+-- COMMAND ----------
+
+INSERT INTO spark_catalog.anna_sviridova_2nsm_da_dewd.events_json 
+
+SELECT 
+  cast(key as BINARY) as key, 
+  cast(offset as LONG) as offset, 
+  cast(partition as INTEGER), 
+  cast(timestamp as LONG), 
+  cast(topic as STRING), 
+  cast(value as BINARY)
+FROM json.`${DA.paths.kafka_events}`
+
+-- COMMAND ----------
+
+select * FROM json.`${DA.paths.kafka_events}` LIMIT 1
+
+-- COMMAND ----------
+
+select * from spark_catalog.anna_sviridova_2nsm_da_dewd.events_json
+
+-- COMMAND ----------
+
+DESCRIBE EXTENDED spark_catalog.anna_sviridova_2nsm_da_dewd.events_json
+
+-- COMMAND ----------
+
 -- <FILL_IN> "${DA.paths.kafka_events}"
 
 -- COMMAND ----------
@@ -93,6 +151,8 @@
 -- MAGIC
 -- MAGIC total = spark.table("events_json").count()
 -- MAGIC assert total == 2252, f"Expected 2252 records, found {total}"
+-- MAGIC # without print or display cmd there is no output
+-- MAGIC print(total)
 
 -- COMMAND ----------
 

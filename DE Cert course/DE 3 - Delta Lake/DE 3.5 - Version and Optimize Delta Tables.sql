@@ -247,6 +247,10 @@ DESCRIBE HISTORY students
 
 -- COMMAND ----------
 
+DESCRIBE detail students
+
+-- COMMAND ----------
+
 -- MAGIC %md
 -- MAGIC
 -- MAGIC
@@ -309,6 +313,14 @@ RESTORE TABLE students TO VERSION AS OF 8
 
 -- COMMAND ----------
 
+describe history students
+
+-- COMMAND ----------
+
+select * from students
+
+-- COMMAND ----------
+
 -- MAGIC %md
 -- MAGIC
 -- MAGIC
@@ -332,7 +344,7 @@ RESTORE TABLE students TO VERSION AS OF 8
 
 -- COMMAND ----------
 
--- VACUUM students RETAIN 0 HOURS
+VACUUM students RETAIN 0 HOURS
 
 -- COMMAND ----------
 

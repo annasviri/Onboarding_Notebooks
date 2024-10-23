@@ -56,6 +56,13 @@
 
 -- COMMAND ----------
 
+Select count(*) as count_rows
+, count_if(items.item_id IS NOT NULL) as count_item_id
+from sales
+
+
+-- COMMAND ----------
+
 SELECT * FROM (
   SELECT
     order_id,
@@ -112,6 +119,14 @@ FROM sales
 -- <FILL_IN>
 -- EXISTS <FILL_IN>.item_name LIKE "%Mattress"
 -- EXISTS <FILL_IN>.item_name LIKE "%Pillow"
+
+-- COMMAND ----------
+
+CREATE OR REPLACE TABLE sales_product_flags AS
+Select items
+,EXISTS (items, i -> i.item_name LIKE "%Mattress") as mattress
+,EXISTS (items, i -> i.item_name LIKE "%Pillow") as pillow
+from sales
 
 -- COMMAND ----------
 

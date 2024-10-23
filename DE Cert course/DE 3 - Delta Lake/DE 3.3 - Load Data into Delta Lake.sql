@@ -114,8 +114,8 @@ DESCRIBE HISTORY sales
 
 -- COMMAND ----------
 
--- INSERT OVERWRITE sales
--- SELECT *, current_timestamp() FROM parquet.`${da.paths.datasets}/ecommerce/raw/sales-historical`
+ INSERT OVERWRITE sales
+ SELECT *, current_timestamp() FROM parquet.`${da.paths.datasets}/ecommerce/raw/sales-historical`
 
 -- COMMAND ----------
 
@@ -170,6 +170,14 @@ FROM parquet.`${da.paths.datasets}/ecommerce/raw/users-30m`
 
 -- COMMAND ----------
 
+select user_id, count(*) as cnt from  users_update
+group by user_id
+order by cnt desc;
+
+select * from users_update where user_id == 'UA000000107388217'
+
+-- COMMAND ----------
+
 -- MAGIC %md
 -- MAGIC
 -- MAGIC  
@@ -190,6 +198,14 @@ ON a.user_id = b.user_id
 WHEN MATCHED AND a.email IS NULL AND b.email IS NOT NULL THEN
   UPDATE SET email = b.email, updated = b.updated
 WHEN NOT MATCHED THEN INSERT *
+
+-- COMMAND ----------
+
+select * from users
+
+-- COMMAND ----------
+
+describe history users
 
 -- COMMAND ----------
 
@@ -223,6 +239,10 @@ WHEN NOT MATCHED AND b.traffic_source = 'email' THEN
 
 -- COMMAND ----------
 
+describe history events
+
+-- COMMAND ----------
+
 -- MAGIC %md
 -- MAGIC
 -- MAGIC  
@@ -243,6 +263,14 @@ WHEN NOT MATCHED AND b.traffic_source = 'email' THEN
 COPY INTO sales
 FROM "${da.paths.datasets}/ecommerce/raw/sales-30m"
 FILEFORMAT = PARQUET
+
+-- COMMAND ----------
+
+select count(*) from sales
+
+-- COMMAND ----------
+
+describe history sales
 
 -- COMMAND ----------
 

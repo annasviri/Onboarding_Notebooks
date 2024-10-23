@@ -69,6 +69,23 @@ SELECT * FROM events_strings
 
 -- COMMAND ----------
 
+-- MAGIC %python
+-- MAGIC #just an experiment with pyspark
+-- MAGIC
+-- MAGIC from pyspark.sql.functions import col
+-- MAGIC from pyspark.sql.functions import count
+-- MAGIC
+-- MAGIC my_DF = (spark
+-- MAGIC          .table("events_raw")
+-- MAGIC          .select(col("key"), col("value").cast("string"),
+-- MAGIC                   col("value").cast("string"))
+-- MAGIC          #.groupby("key")
+-- MAGIC          .agg(count("key").alias("count"))
+-- MAGIC         )
+-- MAGIC display(my_DF)
+
+-- COMMAND ----------
+
 -- MAGIC %md
 -- MAGIC ## Manipulate Complex Types
 
@@ -86,7 +103,12 @@ SELECT * FROM events_strings
 
 -- COMMAND ----------
 
-SELECT * FROM events_strings WHERE value:event_name = "finalize" ORDER BY key LIMIT 1
+SELECT * FROM events_strings WHERE value:event_name = "finalize" ORDER BY key --LIMIT 1
+
+-- COMMAND ----------
+
+--how to call nested value in json 
+SELECT value:device, * FROM events_strings WHERE value:event_name = "finalize" ORDER BY key --LIMIT 1
 
 -- COMMAND ----------
 
@@ -118,6 +140,12 @@ SELECT from_json(value, 'STRUCT<device: STRING, ecommerce: STRUCT<purchase_reven
 FROM events_strings);
 
 SELECT * FROM parsed_events
+
+-- COMMAND ----------
+
+-- select from struct
+select ecommerce.purchase_revenue_in_usd, ecommerce.total_item_quantity, * from parsed_events
+where ecommerce.purchase_revenue_in_usd is not null
 
 -- COMMAND ----------
 
@@ -155,6 +183,14 @@ SELECT * FROM exploded_events WHERE size(items) > 2
 
 -- COMMAND ----------
 
+--explode_outer keeps null
+SELECT *, explode_outer(items) AS item
+FROM parsed_events
+WHERE user_id = 'UA000000107377542'
+order by user_id, device, event_name;
+
+-- COMMAND ----------
+
 -- MAGIC %python
 -- MAGIC from pyspark.sql.functions import explode, size
 -- MAGIC
@@ -179,10 +215,10 @@ DESCRIBE exploded_events
 -- COMMAND ----------
 
 SELECT user_id,
-  collect_set(event_name) AS event_history,
-  array_distinct(flatten(collect_set(items.item_id))) AS cart_history
+  collect_set(event_name) AS event_history, --array from different event-name in history
+  array_distinct(flatten(collect_set(items.item_id))) AS cart_history -- flattened array from different rows
 FROM exploded_events
-GROUP BY user_id
+GROUP BY user_id -- unique rows bu user_id
 
 -- COMMAND ----------
 

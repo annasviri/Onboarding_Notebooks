@@ -93,6 +93,7 @@
 
 # MAGIC %sql
 # MAGIC SELECT * FROM __apply_changes_storage_customers_silver
+# MAGIC --where __DeleteVersion IS NOT NULL
 
 # COMMAND ----------
 

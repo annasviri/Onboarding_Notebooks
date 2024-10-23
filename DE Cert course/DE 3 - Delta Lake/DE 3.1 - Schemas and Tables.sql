@@ -52,7 +52,29 @@
 
 -- COMMAND ----------
 
-CREATE SCHEMA IF NOT EXISTS ${da.schema_name}_default_location;
+CREATE SCHEMA IF NOT EXISTS ${DA.schema_name}_default_location;
+
+-- COMMAND ----------
+
+describe schema anna_sviridova_2nsm_da_dewd_default_location
+
+-- COMMAND ----------
+
+-- MAGIC %python
+-- MAGIC print(DA.schema_name, DA.paths.working_dir)
+
+-- COMMAND ----------
+
+-- MAGIC %md
+-- MAGIC and with defined location 
+
+-- COMMAND ----------
+
+CREATE SCHEMA IF NOT EXISTS ${da.schema_name}_custom_location LOCATION '${da.path.working_dir}/${da.schema_name}_custom_location.db';
+
+-- COMMAND ----------
+
+DROP SCHEMA ${da.schema_name}_custom_location CASCADE
 
 -- COMMAND ----------
 
@@ -65,6 +87,10 @@ CREATE SCHEMA IF NOT EXISTS ${da.schema_name}_default_location;
 -- COMMAND ----------
 
 DESCRIBE SCHEMA EXTENDED ${da.schema_name}_default_location;
+
+-- COMMAND ----------
+
+DESCRIBE SCHEMA EXTENDED ${da.schema_name}_custom_location;
 
 -- COMMAND ----------
 
@@ -96,6 +122,17 @@ SELECT * FROM managed_table;
 -- COMMAND ----------
 
 DESCRIBE EXTENDED managed_table;
+
+-- COMMAND ----------
+
+describe detail managed_table;
+
+-- COMMAND ----------
+
+-- MAGIC %python 
+-- MAGIC tbl_location = spark.sql(f"DESCRIBE DETAIL managed_table")
+-- MAGIC print(tbl_location)
+-- MAGIC display(tbl_location)
 
 -- COMMAND ----------
 
@@ -142,6 +179,23 @@ DROP TABLE managed_table;
 
 -- COMMAND ----------
 
+USE ${DA.schema_name}_custom_location; 
+
+CREATE OR REPLACE TABLE managed_table_custom (width INT, length INT, height INT);
+INSERT INTO managed_table_custom 
+VALUES (3, 2, 1);
+SELECT * FROM managed_table_custom;
+
+-- COMMAND ----------
+
+describe detail managed_table_custom
+
+-- COMMAND ----------
+
+drop schema ${DA.schema_name}_custom_location cascade
+
+-- COMMAND ----------
+
 -- MAGIC %md
 -- MAGIC
 -- MAGIC  
@@ -163,6 +217,10 @@ CREATE OR REPLACE TABLE external_table LOCATION '${da.paths.working_dir}/externa
   SELECT * FROM temp_delays;
 
 SELECT * FROM external_table;
+
+-- COMMAND ----------
+
+SELECT * FROM temp_delays;
 
 -- COMMAND ----------
 

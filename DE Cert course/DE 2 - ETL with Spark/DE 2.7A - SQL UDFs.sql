@@ -55,6 +55,14 @@ SELECT *, sale_announcement(name, price) AS message FROM item_lookup
 
 -- COMMAND ----------
 
+describe item_lookup
+
+-- COMMAND ----------
+
+select * from item_lookup limit 10
+
+-- COMMAND ----------
+
 -- MAGIC %md
 -- MAGIC
 -- MAGIC Note that this function is applied to all values of the column in a parallel fashion within the Spark processing engine. SQL UDFs are an efficient way to define custom logic that is optimized for execution on Databricks.

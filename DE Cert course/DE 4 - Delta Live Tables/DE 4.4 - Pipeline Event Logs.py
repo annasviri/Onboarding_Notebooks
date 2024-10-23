@@ -36,6 +36,8 @@ event_log.createOrReplaceTempView("event_log_raw")
 
 display(event_log)
 
+#spark.sql("select * from event_log_raw")
+
 # COMMAND ----------
 
 # MAGIC %md
@@ -76,6 +78,26 @@ spark.conf.set('latest_update.id', latest_update_id)
 
 # COMMAND ----------
 
+# MAGIC %sql
+# MAGIC SELECT details:user_action:request:edit_request
+# MAGIC   ,details:user_action:request:edit_request:id 
+# MAGIC   ,details:user_action:request:edit_request:name 
+# MAGIC   ,details:user_action:request:edit_request:configuration 
+# MAGIC   ,details:user_action:request:edit_request:clusters
+# MAGIC   ,details:user_action:request:edit_request:libraries
+# MAGIC FROM event_log_raw 
+# MAGIC WHERE event_type = 'user_action' and details:user_action:action ="EDIT"
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC select det:id, det:name, det:configuration, det:clusters, det:libraries
+# MAGIC from (select details:user_action:request:edit_request as det
+# MAGIC from event_log_raw 
+# MAGIC WHERE event_type = 'user_action' and details:user_action:action ="EDIT" ) a
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC ## Examine Lineage
 # MAGIC
@@ -99,6 +121,26 @@ spark.conf.set('latest_update.id', latest_update_id)
 # MAGIC Finally, data quality metrics can be extremely useful for both long term and short term insights into your data.
 # MAGIC
 # MAGIC Below, we capture the metrics for each constraint throughout the entire lifetime of our table.
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT details :flow_progress :data_quality :expectations 
+# MAGIC    FROM event_log_raw
+# MAGIC    WHERE event_type = 'flow_progress' AND 
+# MAGIC          origin.update_id = '${latest_update.id}'
+# MAGIC          and details :flow_progress :data_quality :expectations is not null
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC SELECT explode(
+# MAGIC             from_json(details :flow_progress :data_quality :expectations,
+# MAGIC                       "array<struct<name: string, dataset: string, passed_records: int, failed_records: int>>")
+# MAGIC           ) row_expectations
+# MAGIC    FROM event_log_raw
+# MAGIC    WHERE event_type = 'flow_progress' AND 
+# MAGIC          origin.update_id = '${latest_update.id}'
 
 # COMMAND ----------
 
